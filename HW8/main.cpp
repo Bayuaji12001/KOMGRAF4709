@@ -1,102 +1,96 @@
-#include <iostream>
+#include <GL/glut.h>
+#include <cmath>
 
-using namespace std;
+float translationX = 0.0f; // Translasi dalam sumbu X
 
-int main() {
-  int x1, y1, x2, y2;
-  int xmax, ymax, xmin, ymin;
+void drawOctahedron(float size) {
+    glBegin(GL_TRIANGLES);
 
-  cout << "Masukkan koordinat titik awal (x1, y1): ";
-  cin >> x1 >> y1;
-  cout << "Masukkan koordinat titik akhir (x2, y2): ";
-  cin >> x2 >> y2;
-  cout << "Masukkan koordinat titik sudut kiri atas (xmin, ymin): ";
-  cin >> xmin >> ymin;
-  cout << "Masukkan koordinat titik sudut kanan bawah (xmax, ymax): ";
-  cin >> xmax >> ymax;
+    // Wajah depan
+    glVertex3f(0.0f, 0.0f, size);
+    glVertex3f(size, 0.0f, 0.0f);
+    glVertex3f(0.0f, size, 0.0f);
 
-  // Menentukan apakah titik awal dan titik akhir berada di dalam atau di luar
-  bool titik1DiDalam = true;
-  bool titik2DiDalam = true;
+    glVertex3f(size, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, -size);
+    glVertex3f(0.0f, size, 0.0f);
 
-  // Memeriksa titik awal
-  if (x1 < xmin || x1 > xmax || y1 < ymin || y1 > ymax) {
-    titik1DiDalam = false;
-  }
+    glVertex3f(0.0f, 0.0f, -size);
+    glVertex3f(-size, 0.0f, 0.0f);
+    glVertex3f(0.0f, size, 0.0f);
 
-  // Memeriksa titik akhir
-  if (x2 < xmin || x2 > xmax || y2 < ymin || y2 > ymax) {
-    titik2DiDalam = false;
-  }
+    glVertex3f(-size, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, size);
+    glVertex3f(0.0f, size, 0.0f);
 
-  // Menentukan region code
-  int regionCode = 0;
-  if (titik1DiDalam && titik2DiDalam) {
-    regionCode = 1;
-  } else if (!titik1DiDalam && !titik2DiDalam) {
-    regionCode = 2;
-  } else {
-    if (x1 < xmin && x2 < xmin) {
-      regionCode = 3;
-    } else if (x1 > xmax && x2 > xmax) {
-      regionCode = 4;
-    } else if (y1 < ymin && y2 < ymin) {
-      regionCode = 5;
-    } else if (y1 > ymax && y2 > ymax) {
-      regionCode = 6;
-    } else {
-      regionCode = 7;
-    }
-    if (x1 < xmin && y1 < ymin) {
-      regionCode |= 1;
-    }
-  }
+    // Wajah belakang
+    glVertex3f(0.0f, 0.0f, size);
+    glVertex3f(0.0f, size, 0.0f);
+    glVertex3f(-size, 0.0f, 0.0f);
 
-  // Menampilkan hasil
-  switch (regionCode) {
-    case 1:
-      cout << "Region code: 0000" << endl;
-      cout << "terletak di dalam viewport." << endl;
-      break;
-    case 2:
-      cout << "Region code: 0001" << endl;
-      cout << "terletak sebelah kiri viewport." << endl;
-      break;
-       case 3:
-        cout << "Region code: 0010" << endl;
-      cout << "terletak di sebelah kanan viewport." << endl;
-      break;
-    case 4:
-        cout << "Region code: 0100" << endl;
-      cout << "terletak di sebelah bawah viewport." << endl;
+    glVertex3f(size, 0.0f, 0.0f);
+    glVertex3f(0.0f, size, 0.0f);
+    glVertex3f(0.0f, 0.0f, -size);
 
-      break;
-    case 5:
-    cout << "Region code: 0101" << endl;
-      cout << "terletak di sebelah kiri bawah viewport." << endl;
+    glVertex3f(0.0f, size, 0.0f);
+    glVertex3f(-size, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, size);
 
-      break;
-    case 6:
-    cout << "Region code: 0110" << endl;
-      cout << "terletak di sebelah kanan bawah viewport." << endl;
+    glVertex3f(0.0f, 0.0f, -size);
+    glVertex3f(-size, 0.0f, 0.0f);
+    glVertex3f(0.0f, 0.0f, size);
 
-      break;
-    case 7:
-    cout << "Region code: 1000" << endl;
-      cout << "terletak di sebelah atas viewport." << endl;
+    glEnd();
+}
 
-      break;
-    case 8:
-    cout << "Region code: 1001" << endl;
-      cout << "terletak di sebelah kiri atas viewport." << endl;
+void display() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
 
-      break;
-    case 9:
-    cout << "Region code: 1010" << endl;
-      cout << "terletak di sebelah kanan atas viewport." << endl;
+    // Warna sebelum translasi (merah)
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glPushMatrix();
+    glTranslatef(0.0f, 0.0f, 0.0f); // Translasi awal
+    drawOctahedron(1.0f);
+    glPopMatrix();
 
-      break;
-  }
+    // Warna setelah translasi (hijau)
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glPushMatrix();
+    glTranslatef(translationX, 0.0f, 0.0f); // Translasi sepanjang sumbu X
+    drawOctahedron(1.0f);
+    glPopMatrix();
 
-  return 0;
+    glutSwapBuffers();
+}
+
+void init() {
+    glMatrixMode(GL_PROJECTION);
+    gluPerspective(45.0f, 1.0f, 1.0f, 10.0f); // Proyeksi perspektif
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(3.0f, 3.0f, 3.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f); // Atur matriks pandangan
+}
+
+void update(int value) {
+    translationX += 0.01f; // Pergeseran sepanjang sumbu X
+    glutPostRedisplay();
+    glutTimerFunc(16, update, 0);
+}
+
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); // Tambahkan GLUT_DEPTH untuk buffer kedalaman
+    glutInitWindowSize(400, 400);
+    glutCreateWindow("OpenGL 3D Oktahedron dengan Translasi dan Warna");
+
+    init();
+
+    glutDisplayFunc(display);
+    glutTimerFunc(25, update, 0); // Set timer untuk update secara periodik
+
+    glutMainLoop();
+
+    return 0;
 }
